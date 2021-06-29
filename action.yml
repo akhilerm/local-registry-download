@@ -1,0 +1,24 @@
+name: 'Local Container Registry Download'
+description: 'Local Container download the content of the registry to artifacts and starts registry'
+inputs:
+  port:
+    description: 'Port at which registry should be run'
+    required: false
+    default: '5000'
+  path:
+    description: 'Path from which the data should be uploaded'
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Download the contents
+      uses: actions/download-artifact@v2
+      with:
+        name: registry-data
+
+    - name: Untar the files
+      run: tar -xvf local_registry.tar
+
+    - name: Start the registry
+      run: |
+        docker run -d -p ${{ inputs.port }}:5000 -v ${{ inputs.path }}:/var/lib/registry --name registry registry:2
